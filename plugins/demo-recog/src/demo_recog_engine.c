@@ -414,7 +414,7 @@ static apt_bool_t demo_recog_result_load(demo_recog_channel_t *recog_channel, mr
 	FILE *file;
 	mrcp_engine_channel_t *channel = recog_channel->channel;
 	const apt_dir_layout_t *dir_layout = channel->engine->dir_layout;
-	char *file_path = apt_datadir_filepath_get(dir_layout,"result.xml",message->pool);
+	char *file_path = apt_datadir_filepath_get(dir_layout,"result-dennis.xml",message->pool);
 	if(!file_path) {
 		return FALSE;
 	}
@@ -428,6 +428,8 @@ static apt_bool_t demo_recog_result_load(demo_recog_channel_t *recog_channel, mr
 		size = fread(text,1,sizeof(text),file);
 		apt_string_assign_n(&message->body,text,size,message->pool);
 		fclose(file);
+
+
 
 		/* get/allocate generic header */
 		generic_header = mrcp_generic_header_prepare(message);
