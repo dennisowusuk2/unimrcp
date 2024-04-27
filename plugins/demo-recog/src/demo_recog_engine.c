@@ -34,6 +34,7 @@
 #include <time.h>
 
 clock_t start_time;
+double seconds_elapsed;
 
 #define RECOG_ENGINE_TASK_NAME "Demo Recog Engine"
 
