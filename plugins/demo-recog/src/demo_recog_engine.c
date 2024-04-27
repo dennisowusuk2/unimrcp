@@ -31,6 +31,9 @@
 #include "mpf_activity_detector.h"
 #include "apt_consumer_task.h"
 #include "apt_log.h"
+#include <time.h>
+
+clock_t start_time;
 
 #define RECOG_ENGINE_TASK_NAME "Demo Recog Engine"
 
@@ -314,6 +317,8 @@ static apt_bool_t demo_recog_channel_recognize(mrcp_engine_channel_t *channel, m
 		}
 	}
 
+	start_time = clock();
+
 	response->start_line.request_state = MRCP_REQUEST_STATE_INPROGRESS;
 	/* send asynchronous response */
 	mrcp_engine_channel_message_send(channel,response);
@@ -414,7 +419,7 @@ static apt_bool_t demo_recog_result_load(demo_recog_channel_t *recog_channel, mr
 	FILE *file;
 	mrcp_engine_channel_t *channel = recog_channel->channel;
 	const apt_dir_layout_t *dir_layout = channel->engine->dir_layout;
-	char *file_path = apt_datadir_filepath_get(dir_layout,"result-dennis.xml",message->pool);
+	char *file_path = apt_datadir_filepath_get(dir_layout,"result.xml",message->pool);
 	if(!file_path) {
 		return FALSE;
 	}
@@ -510,6 +515,13 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 				break;
 		}
 
+		seconds_elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+		if (seconds_elapsed >= 15.0) {
+			apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Time elapsed completing recognition " APT_SIDRES_FMT,
+				MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
+			demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);			
+		}
+
 		if(recog_channel->recog_request) {
 			if((frame->type & MEDIA_FRAME_TYPE_EVENT) == MEDIA_FRAME_TYPE_EVENT) {
 				if(frame->marker == MPF_MARKER_START_OF_EVENT) {
@@ -529,6 +541,7 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 		if(recog_channel->audio_out) {
 			fwrite(frame->codec_frame.buffer,1,frame->codec_frame.size,recog_channel->audio_out);
 		}
+
 	}
 	return TRUE;
 }
