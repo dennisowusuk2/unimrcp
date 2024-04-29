@@ -499,6 +499,7 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 				apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Detected Voice Activity " APT_SIDRES_FMT,
 					MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
 				demo_recog_start_of_input(recog_channel);
+				demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);
 				break;
 			case MPF_DETECTOR_EVENT_INACTIVITY:
 				apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Detected Voice Inactivity " APT_SIDRES_FMT,
@@ -516,6 +517,8 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 				break;
 		}
 
+		apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"My Custom Log Message" APT_SIDRES_FMT,
+			MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
 		seconds_elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
 		if (seconds_elapsed >= 15.0) {
 			apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Time elapsed completing recognition " APT_SIDRES_FMT,
