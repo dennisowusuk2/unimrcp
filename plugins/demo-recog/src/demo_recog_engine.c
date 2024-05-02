@@ -32,6 +32,7 @@
 #include "apt_consumer_task.h"
 #include "apt_log.h"
 #include <time.h>
+#include <string.h> 
 
 clock_t start_time;
 double seconds_elapsed;
@@ -276,6 +277,10 @@ static apt_bool_t demo_recog_channel_request_process(mrcp_engine_channel_t *chan
 /** Process RECOGNIZE request */
 static apt_bool_t demo_recog_channel_recognize(mrcp_engine_channel_t *channel, mrcp_message_t *request, mrcp_message_t *response)
 {
+
+	start_time = clock();
+	seconds_elapsed = 0;
+
 	/* process RECOGNIZE request */
 	mrcp_recog_header_t *recog_header;
 	demo_recog_channel_t *recog_channel = channel->method_obj;
@@ -317,8 +322,6 @@ static apt_bool_t demo_recog_channel_recognize(mrcp_engine_channel_t *channel, m
 			}
 		}
 	}
-
-	start_time = clock();
 
 	response->start_line.request_state = MRCP_REQUEST_STATE_INPROGRESS;
 	/* send asynchronous response */
@@ -499,10 +502,9 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 				apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Detected Voice Activity " APT_SIDRES_FMT,
 					MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
 				demo_recog_start_of_input(recog_channel);
-				apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Custom: sending recog complete ..." APT_SIDRES_FMT,
-					MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
-				demo_recog_start_of_input(recog_channel);
-				demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);
+				// apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Custom: sending recog complete ..." APT_SIDRES_FMT,
+				// 	MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
+				// demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);
 				break;
 			case MPF_DETECTOR_EVENT_INACTIVITY:
 				apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Detected Voice Inactivity " APT_SIDRES_FMT,
@@ -523,6 +525,15 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 		// apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"My Custom Log Message" APT_SIDRES_FMT,
 		// 	MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
 		seconds_elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+		char str1[] = "Time elapsed is: ";
+		char str2[20];
+		sprintf(str2, "%.2lf", seconds_elapsed);
+		char final_str[sizeof(str1) + sizeof(str2) - 1];
+		strcpy(final_str, str1);
+		strcat(final_str, str2);
+		apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,final_str APT_SIDRES_FMT,
+			MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
+
 		if (seconds_elapsed >= 15.0) {
 			apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Time elapsed completing recognition " APT_SIDRES_FMT,
 				MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
