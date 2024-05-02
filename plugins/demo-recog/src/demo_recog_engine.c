@@ -522,23 +522,13 @@ static apt_bool_t demo_recog_stream_write(mpf_audio_stream_t *stream, const mpf_
 				break;
 		}
 
-		// apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"My Custom Log Message" APT_SIDRES_FMT,
-		// 	MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
 		seconds_elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
-		// char str1[] = "Time elapsed is: ";
-		// char str2[20];
-		// sprintf(str2, "%.2lf", seconds_elapsed);
-		// char final_str[sizeof(str1) + sizeof(str2) - 1];
-		// strcpy(final_str, str1);
-		// strcat(final_str, str2);
-		// "Attrib name [%s] value [%s]",entry[i].key,entry[i].val
-		apt_log(RECOG_LOG_MARK,APT_PRIO_INFO, "Time elapsed is %.2lf", seconds_elapsed);
+		//apt_log(RECOG_LOG_MARK,APT_PRIO_INFO, "Time elapsed is %.2lf", seconds_elapsed);
 
-		// if (seconds_elapsed >= 15.0) {
-		// 	apt_log(RECOG_LOG_MARK,APT_PRIO_INFO,"Time elapsed completing recognition " APT_SIDRES_FMT,
-		// 		MRCP_MESSAGE_SIDRES(recog_channel->recog_request));
-		// 	demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);			
-		// }
+		if (seconds_elapsed >= 0.10) {
+			apt_log(RECOG_LOG_MARK,APT_PRIO_INFO, "Time elapsed is %.2lf", seconds_elapsed);
+			demo_recog_recognition_complete(recog_channel,RECOGNIZER_COMPLETION_CAUSE_SUCCESS);			
+		}
 
 		if(recog_channel->recog_request) {
 			if((frame->type & MEDIA_FRAME_TYPE_EVENT) == MEDIA_FRAME_TYPE_EVENT) {
